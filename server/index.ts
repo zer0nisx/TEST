@@ -1,4 +1,4 @@
-import db from './database';
+import db, { hashPassword } from './database';
 
 const server = Bun.serve({
   port: 3001,
@@ -22,7 +22,8 @@ const server = Bun.serve({
       // AUTH ROUTES
       if (path === '/api/auth/login' && req.method === 'POST') {
         const { username, password } = await req.json();
-        const user = db.query('SELECT * FROM users WHERE username = ? AND password = ?').get(username, password) as any;
+        const hashedPassword = hashPassword(password);
+        const user = db.query('SELECT * FROM users WHERE username = ? AND password = ?').get(username, hashedPassword) as any;
 
         if (user) {
           const { password: _, ...userWithoutPassword } = user;

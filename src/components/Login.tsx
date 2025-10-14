@@ -81,8 +81,8 @@ export function Login() {
               Usuarios de prueba:
             </p>
             <div className="mt-2 space-y-1 text-xs text-slate-500 text-center">
-              <p>Admin: <span className="text-slate-400">admin / admin123</span></p>
-              <p>Usuario: <span className="text-slate-400">usuario / usuario123</span></p>
+              <p>Admin: <span className="text-slate-400">admin / 123456</span></p>
+              <p>Usuario: <span className="text-slate-400">usuario / 123456</span></p>
             </div>
           </div>
         </CardContent>

@@ -109,20 +109,30 @@ db.run(`
   )
 `);
 
+// Función para hashear contraseñas
+function hashPassword(password: string): string {
+  const hasher = new Bun.CryptoHasher('sha256');
+  hasher.update(password);
+  return hasher.digest('hex');
+}
+
 // Insertar usuarios por defecto si no existen
 const adminExists = db.query('SELECT id FROM users WHERE username = ?').get('admin');
 if (!adminExists) {
   const adminId = crypto.randomUUID();
+  const hashedPassword = hashPassword('123456');
   db.run(
     'INSERT INTO users (id, username, password, role, created_at) VALUES (?, ?, ?, ?, ?)',
-    [adminId, 'admin', 'admin123', 'admin', new Date().toISOString()]
+    [adminId, 'admin', hashedPassword, 'admin', new Date().toISOString()]
   );
 
   const userId = crypto.randomUUID();
   db.run(
     'INSERT INTO users (id, username, password, role, custom_permissions, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-    [userId, 'usuario', 'usuario123', 'user', JSON.stringify(['create', 'read']), new Date().toISOString()]
+    [userId, 'usuario', hashedPassword, 'user', JSON.stringify(['create', 'read']), new Date().toISOString()]
   );
 }
+
+export { hashPassword };
 
 export default db;
