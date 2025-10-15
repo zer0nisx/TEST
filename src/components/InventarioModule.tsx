@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Plus, Package, ArrowUpCircle, ArrowDownCircle, Trash2 } from 'lucide-react';
 import type { Producto, UnidadMedida } from '@/types';
 import { format } from 'date-fns';
+import { MaterialesSelector } from '@/components/MaterialesSelector';
 
 const UNIDADES: UnidadMedida[] = ['litros', 'kg', 'gramos', 'unidades', 'ml', 'mg', 'lb', 'oz'];
 
@@ -48,14 +49,18 @@ export function InventarioModule() {
   });
 
   const [movimientoForm, setMovimientoForm] = useState({
-    productoId: '',
-    tipo: 'salida' as 'entrada' | 'salida',
-    cantidad: '',
-    loteId: '',
     citaId: '',
     asignadoACita: false,
     motivo: '',
   });
+
+  const [materialesSeleccionados, setMaterialesSeleccionados] = useState<Array<{
+    productoId: string;
+    productoNombre: string;
+    cantidad: number;
+    unidadMedida: string;
+    cantidadDisponible: number;
+  }>>([]);
 
   useEffect(() => {
     loadProductos();
@@ -135,23 +140,37 @@ export function InventarioModule() {
 
   const handleCreateMovimiento = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (materialesSeleccionados.length === 0) {
+      toast.error('Debes seleccionar al menos un material');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await api.createMovimiento({
-        ...movimientoForm,
-        cantidad: Number(movimientoForm.cantidad),
-        loteId: movimientoForm.loteId || null,
-        citaId: movimientoForm.asignadoACita ? movimientoForm.citaId : null,
-        realizadoPor: user?.id,
-      });
-      toast.success('Movimiento registrado');
+      // Registrar cada material como un movimiento
+      for (const material of materialesSeleccionados) {
+        await api.createMovimiento({
+          productoId: material.productoId,
+          tipo: 'salida',
+          cantidad: material.cantidad,
+          loteId: null,
+          citaId: movimientoForm.asignadoACita ? movimientoForm.citaId : null,
+          asignadoACita: movimientoForm.asignadoACita,
+          motivo: movimientoForm.motivo,
+          realizadoPor: user?.id,
+        });
+      }
+
+      toast.success(`${materialesSeleccionados.length} material(es) registrado(s)`);
       await loadProductos();
       await loadMovimientos();
       setIsMovimientoDialogOpen(false);
       resetMovimientoForm();
+      setMaterialesSeleccionados([]);
     } catch (error) {
-      toast.error('Error al registrar movimiento');
+      toast.error('Error al registrar movimientos');
     } finally {
       setLoading(false);
     }
@@ -192,14 +211,11 @@ export function InventarioModule() {
 
   const resetMovimientoForm = () => {
     setMovimientoForm({
-      productoId: '',
-      tipo: 'salida',
-      cantidad: '',
-      loteId: '',
       citaId: '',
       asignadoACita: false,
       motivo: '',
     });
+    setMaterialesSeleccionados([]);
   };
 
   return (
@@ -383,44 +399,19 @@ export function InventarioModule() {
             <DialogTrigger asChild>
               <Button variant="outline" disabled={!hasPermission('create')}>
                 <ArrowDownCircle className="mr-2 h-4 w-4" />
-                Sacar Material
+                Sacar Materiales
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Registrar Salida de Material</DialogTitle>
+                <DialogTitle>Registrar Salida de Materiales</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleCreateMovimiento} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Producto *</Label>
-                  <Select
-                    value={movimientoForm.productoId}
-                    onValueChange={(v) => setMovimientoForm({ ...movimientoForm, productoId: v })}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona un producto" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productos.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.nombre} - Disponible: {p.cantidadTotal} {p.unidadMedida}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Cantidad *</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={movimientoForm.cantidad}
-                    onChange={(e) => setMovimientoForm({ ...movimientoForm, cantidad: e.target.value })}
-                  />
-                </div>
+                <MaterialesSelector
+                  productos={productos}
+                  materialesSeleccionados={materialesSeleccionados}
+                  onMaterialesChange={setMaterialesSeleccionados}
+                />
 
                 <div className="flex items-center space-x-2">
                   <input
@@ -459,7 +450,7 @@ export function InventarioModule() {
                   <Textarea
                     value={movimientoForm.motivo}
                     onChange={(e) => setMovimientoForm({ ...movimientoForm, motivo: e.target.value })}
-                    placeholder="Razón de la salida del material"
+                    placeholder="Razón de la salida de los materiales"
                   />
                 </div>
 
@@ -467,8 +458,8 @@ export function InventarioModule() {
                   <Button type="button" variant="outline" onClick={() => setIsMovimientoDialogOpen(false)}>
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={loading}>
-                    Registrar
+                  <Button type="submit" disabled={loading || materialesSeleccionados.length === 0}>
+                    Registrar ({materialesSeleccionados.length} {materialesSeleccionados.length === 1 ? 'material' : 'materiales'})
                   </Button>
                 </div>
               </form>

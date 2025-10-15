@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Calendar, Package, Users, LogOut, Moon, Sun } from 'lucide-react';
+import { Calendar, Package, Users, LogOut, Moon, Sun, LayoutDashboard } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface LayoutProps {
@@ -15,6 +15,7 @@ export function Layout({ children, currentTab, onTabChange }: LayoutProps) {
   const { theme, setTheme } = useTheme();
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'citas', label: 'Citas', icon: Calendar },
     { id: 'clientes', label: 'Clientes', icon: Users },
     { id: 'inventario', label: 'Inventario', icon: Package },

@@ -1,45 +1,21 @@
-# Todos - Agenda de Citas App
+# TODO - Mejoras del Sistema
 
-## Setup
-- [x] Crear proyecto con React + Vite + Shadcn
-- [x] Instalar componentes shadcn necesarios
-- [x] Configurar modo oscuro con cache
-- [x] Configurar estructura de carpetas
-- [x] Base de datos SQLite con Bun
-- [x] API Backend con Bun
+## ✅ Completado
+- [x] Sistema de encriptación de contraseñas con SHA-256
+- [x] Actualizar credenciales a 123456 para ambos usuarios
+- [x] Base de datos recreada
 
-## Módulos
-- [x] Sistema de autenticación (Login/OAuth)
-- [x] Gestión de roles y permisos
-- [x] Módulo de Citas con Calendario
-- [x] Módulo de Inventario
-- [x] Módulo de Clientes
-- [x] Integración entre módulos
+## 🔄 En Progreso
 
-## Características Citas
-- [x] Crear citas
-- [x] Vista de calendario
-- [x] Editar/Eliminar citas
-- [x] Selección de slots para crear
-- [x] Validación de conflictos
-- [x] Duración personalizada
-- [x] Colores personalizados/random
-- [x] Diálogo con detalles
-- [x] Búsqueda de clientes por cédula
-- [x] Estados de citas
+### Inventario
+- [ ] Mostrar cantidades disponibles de los artículos
+- [ ] Implementar buscador tipo lista para seleccionar materiales
+- [ ] Permitir agregar múltiples artículos a la vez (array)
+- [ ] Asociar materiales usados con las citas
 
-## Características Inventario
-- [x] Crear productos
-- [x] Gestión de lotes
-- [x] Múltiples unidades de medida
-- [x] Entrada/Salida de inventario
-- [x] Asociar a citas
-- [x] Historial de movimientos
-- [x] Alertas de stock bajo
-
-## Características Clientes
-- [x] Búsqueda por cédula
-- [x] CRUD completo
-- [x] Historial de citas
-- [x] Materiales usados por cita
-- [x] Búsqueda en tabla
+### Dashboard
+- [ ] Crear módulo Dashboard
+- [ ] Estadísticas de clientes
+- [ ] Estadísticas de citas (completadas, agendadas, canceladas)
+- [ ] Tabla semanal con número de citas por día
+- [ ] Lista de clientes agendados por día
